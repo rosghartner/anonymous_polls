@@ -30,7 +30,7 @@ class CreateNewPollView(generics.CreateAPIView):
 class UpdatePollView(generics.UpdateAPIView):
     """Редактирование Опроса"""
     serializer_class = PollCreateSerializer
-    queryset = Poll.objects.all()
+    #queryset = Poll.objects.all()
 
 
 # '''class PollListView(APIView):

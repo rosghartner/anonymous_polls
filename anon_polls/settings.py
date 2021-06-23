@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
-    'drf_yasg',
+    'djoser', #mails send
+    'drf_yasg', #swagger
 
     'polls',
 ]
@@ -156,6 +156,7 @@ DJOSER = {
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {},
+    'LOGIN_FIELD': 'email',
 }
 
 SIMPLE_JWT = {
