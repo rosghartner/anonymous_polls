@@ -7,4 +7,5 @@ urlpatterns = [
     path('poll/<int:pk>', views.PollDetailView.as_view()),
     path('poll/create', views.CreateNewPollView.as_view()),
     path('poll/update/<int:pk>', views.UpdatePollView.as_view()),
+    path('rating/', views.AddRatingView.as_view()),
 ]

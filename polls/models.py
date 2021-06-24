@@ -54,3 +54,23 @@ class Choice(models.Model):
     def __str__(self):
         return self.answer.title
 
+class Rating(models.Model):
+    """Рейтинг"""
+    RATE_CHOICES = (
+        (5, "5"),
+        (4, "4"),
+        (3, "3"),
+        (2, "2"),
+        (1, "1"),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, )
+    rate = models.PositiveSmallIntegerField(choices=RATE_CHOICES)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name = 'ratings')
+
+    def __str__(self) -> str:
+        return f'{self.rate} - {self.poll}'
+
+    class Meta:
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
+        

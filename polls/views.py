@@ -1,17 +1,24 @@
-from rest_framework import permissions, generics
-#from rest_framework.response import Response
-#from rest_framework.views import APIView
-
-from .models import Poll
-from .serializers import PollListSerializer, PollDetailSerializer, PollCreateSerializer
+from rest_framework import permissions, generics, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.db import models
+ 
+from .models import Poll, Question
+from .serializers import PollListSerializer, PollDetailSerializer, PollCreateSerializer, CreateRatingSerializer
 
 
 class PollListView(generics.ListAPIView):
     """вывод списка опросов"""
     serializer_class = PollListSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
-        polls = Poll.objects.all()
+        
+        print(self.request.user)
+        polls = Poll.objects.all().annotate(
+            rating_user = models.Count('ratings', filter=models.Q(ratings__user=self.request.user)) #проверяем голосовал ли пользователь
+        ).annotate(
+            middle_rate = models.Sum(models.F('ratings__rate')) / models.Count(models.F('ratings')) #средняя оценка
+        )
         return polls
 
 
@@ -30,8 +37,25 @@ class CreateNewPollView(generics.CreateAPIView):
 class UpdatePollView(generics.UpdateAPIView):
     """Редактирование Опроса"""
     serializer_class = PollCreateSerializer
-    #queryset = Poll.objects.all()
+    queryset = Poll.objects.all()
 
+
+class AddRatingView(generics.CreateAPIView):
+    """добавление рейтинга опросу"""
+
+    serializer_class = CreateRatingSerializer
+
+
+
+'''class AddRatingView(APIView):
+    """добавление рейтинга опросу"""
+    def post(self, request):
+        serializer = CreateRatingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201)
+        else:
+            return Response(status=400)'''
 
 # '''class PollListView(APIView):
 #     """вывод списка опросов"""
