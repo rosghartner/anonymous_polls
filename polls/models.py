@@ -47,12 +47,13 @@ class Answer(models.Model):
 class Choice(models.Model):
     """Вариант ответа"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
     answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.answer.title
+        return self.answer.answer
 
 class Rating(models.Model):
     """Рейтинг"""

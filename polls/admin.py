@@ -36,11 +36,12 @@ class AnswerAdmin(admin.ModelAdmin):
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = (
         'user',
+        'poll',
         'question',
         'answer',
         'created',
     )
-    list_filter = ('user',)
+    list_filter = ('user', 'poll',)
 
 class RatingAdmin(admin.ModelAdmin):
     list_display = ('rate', 'user', 'poll',)
