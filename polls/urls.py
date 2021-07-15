@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('poll/choice', views.CreateChoiceView.as_view()),
+    path('poll/choice', views.CreateChoiceViewSet.as_view({'post': 'create'})),
     #path('poll/update/<int:pk>', views.UpdatePollView.as_view()),
 
     path('rating/', views.AddRatingViewSet.as_view({'post': 'create'})), #works

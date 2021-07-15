@@ -55,7 +55,7 @@ class AddRatingViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
 
 class QuestionsViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
-    """s"""
+    """Создание, удаление, обновление вопросов"""
     permission_classes = [permissions.IsAuthenticated]
 
     queryset = Question.objects.filter()
@@ -70,7 +70,7 @@ class QuestionsViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
 
 
 class AnswersViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
-    """s"""
+    """Создание, удаление, обновление ответов"""
     permission_classes = [permissions.IsAuthenticated]
     queryset = Answer.objects.all()
     def get_serializer_class(self):
@@ -82,7 +82,7 @@ class AnswersViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.Up
             return AnswerSerializer
 
 
-class CreateChoiceView(generics.CreateAPIView): #переделать
+class CreateChoiceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     """Сохранение результатов прохождения опроса"""
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CreateChoiceSerializer

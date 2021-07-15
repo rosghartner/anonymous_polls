@@ -129,9 +129,43 @@ class CreateRatingSerializer(serializers.ModelSerializer):
         )
         return rating
 
+# class AnswerChoiceSerializer(serializers.ModelSerializer):
+#     """question id for choices"""
+#     id = Answer.id
+#     class Meta:
+#         model = Answer
+#         fields = ('id',)
+
+# class QuestionChoiceSerializer(serializers.ModelSerializer):
+#     """question id for choices"""
+#     answer = AnswerChoiceSerializer(many=True)
+#     id = serializers.IntegerField()
+#     class Meta:
+#         model = Question
+#         fields = ('id', 'answer')
+
+
 class CreateChoiceSerializer(serializers.ModelSerializer):
+    """Прохождение опроса"""
+    # questions = QuestionChoiceSerializer(many=True)
 
     class Meta:
         model = Choice
-        #fields = "__all__"
-        fields = ('id', 'user', 'poll', 'question', 'answer')
+        fields = ('user', 'poll', 'question', 'answer')
+        
+    # def create(self, validated_data):
+    #     print(validated_data)
+    #     questions_data = validated_data.pop('questions')
+    #     for question_data in questions_data:
+    #         answers_data = question_data.pop('answer')
+    #         question = question_data.get('id')
+    #         print('****************************o hi mark', question)
+    #         for answer_data in answers_data:
+    #             choice, _ = Choice.objects.create(
+    #                 user = validated_data.get('user', None),
+    #                 poll = validated_data.get('poll', None),
+    #                 question = question,
+    #                 answer = answer_data.pop('id', None),
+                    
+    #                 )
+    #     return True
