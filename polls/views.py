@@ -1,7 +1,7 @@
-from django.http import request
-from rest_framework import permissions, generics, viewsets, mixins, serializers
-from rest_framework.response import Response
-from rest_framework.views import APIView
+# from django.http import request
+from rest_framework import permissions, viewsets, mixins # serializers, generics, 
+# from rest_framework.response import Response
+# from rest_framework.views import APIView
 from django.db import models
  
 from .models import Poll, Question, Answer

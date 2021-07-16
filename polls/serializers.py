@@ -129,23 +129,6 @@ class CreateRatingSerializer(serializers.ModelSerializer):
         )
         return rating
 
-# class AnswerChoiceSerializer(serializers.ModelSerializer):
-#     """question id for choices"""
-#     #id = serializers.IntegerField()
-
-#     class Meta:
-#         model = Answer
-#         fields = ('answer',)
-
-# class QuestionChoiceSerializer(serializers.ModelSerializer):
-#     """question id for choices"""
-#     answers = AnswerChoiceSerializer(many=True)
-#     #id = serializers.IntegerField()
-
-#     class Meta:
-#         model = Question
-#         fields = ('question', 'answers')
-
 
 class ChoiceSerializer(serializers.ModelSerializer):
     """Ы"""
@@ -161,10 +144,18 @@ class CreateChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choices
         fields = ('user', 'poll', 'choice')
-        
+
     def create(self, validated_data):
         choices_data = validated_data.pop('choice')
-        choices = Choices.objects.create(**validated_data)
+        choices, _ = Choices.objects.update_or_create(
+            # user = validated_data.get('user', None),
+            # poll = validated_data.get('poll', None)
+            **validated_data
+        )
         for choice_data in choices_data:
-            Choice.objects.create(choices = choices, **choice_data)
+            Choice.objects.update_or_create(
+                choices = choices,
+                question = choice_data.get('question', None),
+                defaults={'answer': choice_data.get('answer')}
+            )
         return choices
