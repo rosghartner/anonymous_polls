@@ -1,7 +1,8 @@
 from rest_framework import serializers
+from rest_framework.fields import IntegerField
 
 
-from .models import Choice, Poll, Question, Answer, Rating
+from .models import Choice, Choices, Poll, Question, Answer, Rating
 
 
 class PollListSerializer(serializers.ModelSerializer):
@@ -57,14 +58,13 @@ class QuestionUpdateSerializer(serializers.ModelSerializer):
         fields = ('question', 'id') 
 
 
-# class PollDetailSerializer(serializers.ModelSerializer):
-#     """Опрос"""
-#     questions = QuestionSerializer(many=True)
-#     #creator = serializers.SlugRelatedField(slug_field='username', read_only=True) #выводит юзернейм вместо айдишника
+class PollDetailSerializer(serializers.ModelSerializer):
+    """Опрос"""
+    questions = QuestionSerializer(many=True)
     
-#     class Meta:
-#         model = Poll
-#         fields = ('title', 'id', 'creator', 'description', 'questions')
+    class Meta:
+        model = Poll
+        fields = ('title', 'id', 'creator', 'description', 'questions')
 
 
 class PollCreateSerializer(serializers.ModelSerializer):
@@ -131,41 +131,40 @@ class CreateRatingSerializer(serializers.ModelSerializer):
 
 # class AnswerChoiceSerializer(serializers.ModelSerializer):
 #     """question id for choices"""
-#     id = Answer.id
+#     #id = serializers.IntegerField()
+
 #     class Meta:
 #         model = Answer
-#         fields = ('id',)
+#         fields = ('answer',)
 
 # class QuestionChoiceSerializer(serializers.ModelSerializer):
 #     """question id for choices"""
-#     answer = AnswerChoiceSerializer(many=True)
-#     id = serializers.IntegerField()
+#     answers = AnswerChoiceSerializer(many=True)
+#     #id = serializers.IntegerField()
+
 #     class Meta:
 #         model = Question
-#         fields = ('id', 'answer')
+#         fields = ('question', 'answers')
+
+
+class ChoiceSerializer(serializers.ModelSerializer):
+    """Ы"""
+
+    class Meta:
+        model = Choice
+        fields = ('question', 'answer',)
 
 
 class CreateChoiceSerializer(serializers.ModelSerializer):
     """Прохождение опроса"""
-    # questions = QuestionChoiceSerializer(many=True)
-
+    choice = ChoiceSerializer(many=True)
     class Meta:
-        model = Choice
-        fields = ('user', 'poll', 'question', 'answer')
+        model = Choices
+        fields = ('user', 'poll', 'choice')
         
-    # def create(self, validated_data):
-    #     print(validated_data)
-    #     questions_data = validated_data.pop('questions')
-    #     for question_data in questions_data:
-    #         answers_data = question_data.pop('answer')
-    #         question = question_data.get('id')
-    #         print('****************************o hi mark', question)
-    #         for answer_data in answers_data:
-    #             choice, _ = Choice.objects.create(
-    #                 user = validated_data.get('user', None),
-    #                 poll = validated_data.get('poll', None),
-    #                 question = question,
-    #                 answer = answer_data.pop('id', None),
-                    
-    #                 )
-    #     return True
+    def create(self, validated_data):
+        choices_data = validated_data.pop('choice')
+        choices = Choices.objects.create(**validated_data)
+        for choice_data in choices_data:
+            Choice.objects.create(choices = choices, **choice_data)
+        return choices

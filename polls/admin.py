@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Answer, Choice, Poll, Rating
+from .models import Question, Answer, Choice, Choices, Poll, Rating
 
 class AnswerInline(admin.TabularInline):
     model = Answer
@@ -35,13 +35,16 @@ class AnswerAdmin(admin.ModelAdmin):
 
 class ChoiceAdmin(admin.ModelAdmin):
     list_display = (
-        'user',
-        'poll',
         'question',
         'answer',
-        'created',
     )
-    list_filter = ('user', 'poll',)
+    #list_filter = ('user', 'poll',)
+
+# class ChoicesAdmin(admin.ModelAdmin): #закоментированно для анонимности
+#     list_display = (
+#         'user',
+#         'poll'
+#     )
 
 class RatingAdmin(admin.ModelAdmin):
     list_display = ('rate', 'user', 'poll',)
@@ -50,5 +53,6 @@ class RatingAdmin(admin.ModelAdmin):
 admin.site.register(Poll, PollAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice, ChoiceAdmin)
+# admin.site.register(Choices, ChoicesAdmin)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Rating, RatingAdmin)

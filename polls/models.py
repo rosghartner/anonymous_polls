@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.deletion import CASCADE
 
 
 class Poll(models.Model):
@@ -44,16 +45,31 @@ class Answer(models.Model):
         verbose_name_plural = 'Ответы'
 
 
-class Choice(models.Model):
+class Choices(models.Model):
     """Вариант ответа"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
-    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING)
     created = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.poll.title
 
+class Choice(models.Model):
+    """Вариант ответа"""
+    choices = models.ForeignKey(Choices, on_delete=models.CASCADE, related_name='choice')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    
     def __str__(self):
         return self.answer.answer
+
+
+
+# class PollChoice(models.Model):
+#     """Ответы на Опрос"""
+#     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
+#     choice = 
 
 class Rating(models.Model):
     """Рейтинг"""

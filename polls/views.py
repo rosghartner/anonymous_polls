@@ -7,7 +7,7 @@ from django.db import models
 from .models import Poll, Question, Answer
 from .serializers import (
     PollListSerializer, 
-    # PollDetailSerializer, 
+    PollDetailSerializer, 
     PollCreateSerializer,
     PollUpdateSerializer, 
     CreateRatingSerializer,
@@ -32,7 +32,7 @@ class PollsViewSet(viewsets.ModelViewSet):
         polls = Poll.objects.annotate(
             rating_user = models.Count('ratings', filter=models.Q(ratings__user=self.request.user)) #проверяем голосовал ли пользователь
         ).annotate(
-            middle_rate=Round(models.Avg("ratings__rate"))
+            middle_rate = Round(models.Avg("ratings__rate"))
         ).all()
         return polls
 
@@ -86,21 +86,36 @@ class CreateChoiceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     """Сохранение результатов прохождения опроса"""
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CreateChoiceSerializer
+    
+    
 
-    # def perform_create(self, serializer):
-    #     poll = serializer.save()
-    #     #poll = Poll.objects.create(**serializer.validated_data)
-    #     #print('************serial.validdata', serializer.validated_data)
-    #     poll_ = Poll.objects.get('?')
-    #     questions = serializer.validated_data.get('questions')
-    #     print(' o hi mark ********', questions)
-    #     Question.objects.bulk_create(
-    #         Question(poll = poll_, **question)
-    #         for question in questions
-    #     )
-        
-    #     #return super().perform_create(serializer)
-    #     return poll
+class PollDataViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    """Данные об опросе"""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PollDetailSerializer
+
+    def get_queryset(self):
+        poll = Poll.objects.annotate(
+
+        ).filter()
+        #return super().get_queryset()
+        return poll
+
+
+# def perform_create(self, serializer):
+#     poll = serializer.save()
+#     #poll = Poll.objects.create(**serializer.validated_data)
+#     #print('************serial.validdata', serializer.validated_data)
+#     poll_ = Poll.objects.get('?')
+#     questions = serializer.validated_data.get('questions')
+#     print(' o hi mark ********', questions)
+#     Question.objects.bulk_create(
+#         Question(poll = poll_, **question)
+#         for question in questions
+#     )
+    
+#     #return super().perform_create(serializer)
+#     return poll
 
 
 # class CreateNewPollView(generics.CreateAPIView): #переделать
