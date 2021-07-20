@@ -23,7 +23,6 @@ class Question(models.Model):
     question = models.CharField('вопрос', max_length=4096)
     # lock_other = models.BooleanField(default=False)
     
-
     def __str__(self):
            return self.question
 
@@ -54,6 +53,7 @@ class Choices(models.Model):
     def __str__(self):
         return self.poll.title
 
+
 class Choice(models.Model):
     """Вариант ответа"""
     choices = models.ForeignKey(Choices, on_delete=models.CASCADE, related_name='choice')
@@ -62,7 +62,6 @@ class Choice(models.Model):
     
     def __str__(self):
         return self.answer.answer
-
 
 
 # class PollChoice(models.Model):

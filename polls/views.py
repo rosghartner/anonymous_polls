@@ -1,10 +1,12 @@
 # from django.http import request
+from django.db.models.aggregates import Count
 from rest_framework import permissions, viewsets, mixins # serializers, generics, 
 # from rest_framework.response import Response
 # from rest_framework.views import APIView
 from django.db import models
+from django.db.models import Case, CharField, Value, When
  
-from .models import Poll, Question, Answer
+from .models import Choices, Poll, Question, Answer
 from .serializers import (
     PollListSerializer, 
     PollDetailSerializer, 
@@ -72,7 +74,17 @@ class QuestionsViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
 class AnswersViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     """Создание, удаление, обновление ответов"""
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Answer.objects.all()
+    queryset = Answer.objects.annotate(
+            total_a = models.Count('choice')
+        ).all()
+
+
+    # def answer_annotate(self):
+    #     answer = Answer.objects.annotate(
+    #         total_a = models.Count('')
+    #     ).all()
+    #     return answer
+        
     def get_serializer_class(self):
         if self.action == 'create':
             return AnswerCreateSerializer
@@ -96,10 +108,15 @@ class PollDataViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
 
     def get_queryset(self):
         poll = Poll.objects.annotate(
-
+            total_complete = models.Count('choices')
         ).filter()
-        #return super().get_queryset()
         return poll
+
+    # def answer_annotate(self):
+    #     answer = Answer.objects.annotate(
+    #         total_a = models.Count('')
+    #     ).all()
+    #     return answer
 
 
 # def perform_create(self, serializer):

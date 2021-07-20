@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from rest_framework.fields import IntegerField
-
 
 from .models import Choice, Choices, Poll, Question, Answer, Rating
 
@@ -18,7 +16,9 @@ class AnswerSerializer(serializers.ModelSerializer):
     """Ответы"""
     class Meta:
         model = Answer
-        fields = ('answer', 'id')
+        fields = ('answer', 'id',)
+
+
 
 class AnswerCreateSerializer(serializers.ModelSerializer):
     """Ответы"""
@@ -34,6 +34,9 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ('question', 'id', 'answers') 
+
+
+
 
 class QuestionCreateSerializer(serializers.ModelSerializer):
     """Вопросы"""    
@@ -58,13 +61,6 @@ class QuestionUpdateSerializer(serializers.ModelSerializer):
         fields = ('question', 'id') 
 
 
-class PollDetailSerializer(serializers.ModelSerializer):
-    """Опрос"""
-    questions = QuestionSerializer(many=True)
-    
-    class Meta:
-        model = Poll
-        fields = ('title', 'id', 'creator', 'description', 'questions')
 
 
 class PollCreateSerializer(serializers.ModelSerializer):
@@ -74,7 +70,7 @@ class PollCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Poll
-        fields = ('title', 'id', 'creator', 'description', 'questions',)
+        fields = ('title', 'id', 'creator', 'description', 'questions', )
 
     def create(self, validated_data): #validated_data - данные которые мы получаем с клиентской стороны
         questions_data = validated_data.pop('questions')
@@ -93,26 +89,6 @@ class PollUpdateSerializer(serializers.ModelSerializer):
         model = Poll
         fields = ('title', 'id', 'creator', 'description')
 
-    # def update(self, instance, validated_data):
-    #     instance.title = validated_data.get('title', instance.title)
-    #     instance.description = validated_data.get('description', instance.description)
-    #     print('-----------------',instance.questions.all())
-    #     questions_data = validated_data.pop('questions')
-    #     questions = instance.questions.all()
-    #     print(questions, '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-    #     # questions_data_dict = dict((i.id, i)for i in instance.questions.all())
-    #     # print('словарь--------------',questions_data_dict)
-    #     for question_data in questions_data:
-    #         #question = Question.objects.get(poll = instance)    #надо разобраться как получить один экземпляр
-    #         #print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', question)
-    #         print('----------------question_data ------------',question_data)
-    #         print('----------------Question.question ------------',Question.question)
-    #         answers_data = question_data.pop('answers')
-    #         for answer_data in answers_data:
-    #             print('----------------answer_data ------------',answer_data)
-
-    #     instance.save() #обновляем тайтл и дескрипшен
-    #     return instance
 
 class CreateRatingSerializer(serializers.ModelSerializer):
     """Голосование за опрос"""
@@ -132,15 +108,19 @@ class CreateRatingSerializer(serializers.ModelSerializer):
 
 class ChoiceSerializer(serializers.ModelSerializer):
     """Ы"""
-
+    # total_a = serializers.SerializerMethodField()
+    # def get_total_a(self, obj):
+    #     return obj.choice.count()
     class Meta:
         model = Choice
         fields = ('question', 'answer',)
 
+    
+
 
 class CreateChoiceSerializer(serializers.ModelSerializer):
     """Прохождение опроса"""
-    choice = ChoiceSerializer(many=True)
+    choice = ChoiceSerializer(many=True, read_only=True)
     class Meta:
         model = Choices
         fields = ('user', 'poll', 'choice')
@@ -159,3 +139,31 @@ class CreateChoiceSerializer(serializers.ModelSerializer):
                 defaults={'answer': choice_data.get('answer')}
             )
         return choices
+
+class AnswerSerializer1(serializers.ModelSerializer):
+    """Ответы"""
+    #choice = ChoiceSerializer(many=True, read_only=True)
+    total_answer = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Answer
+        fields = ('answer', 'id',  'total_answer',)#'choice',
+
+    def get_total_answer(self,obj):
+        return Choice.objects.filter(answer=obj).count()
+
+class QuestionSerializer1(serializers.ModelSerializer):
+    """Вопросы"""    
+    answers = AnswerSerializer1(many=True)
+    class Meta:
+        model = Question
+        fields = ('question', 'id', 'answers') 
+
+class PollDetailSerializer(serializers.ModelSerializer):
+    """Опрос"""
+    questions = QuestionSerializer1(many=True)
+    total_complete = serializers.IntegerField()
+    
+    class Meta:
+        model = Poll
+        fields = ('title', 'id', 'creator', 'description', 'total_complete', 'questions',)
