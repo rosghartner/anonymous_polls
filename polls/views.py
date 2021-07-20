@@ -74,17 +74,8 @@ class QuestionsViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.
 class AnswersViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     """Создание, удаление, обновление ответов"""
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Answer.objects.annotate(
-            total_a = models.Count('choice')
-        ).all()
+    queryset = Answer.objects.all()
 
-
-    # def answer_annotate(self):
-    #     answer = Answer.objects.annotate(
-    #         total_a = models.Count('')
-    #     ).all()
-    #     return answer
-        
     def get_serializer_class(self):
         if self.action == 'create':
             return AnswerCreateSerializer
