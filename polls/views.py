@@ -1,29 +1,31 @@
 # from django.http import request
-from django.db.models.aggregates import Count
+#from django.db.models.aggregates import Count
 from rest_framework import permissions, viewsets, mixins # serializers, generics, 
 # from rest_framework.response import Response
 # from rest_framework.views import APIView
 from django.db import models
-from django.db.models import Case, CharField, Value, When
  
-from .models import Choices, Poll, Question, Answer
+from .models import Poll, Question, Answer, Choices
 from .serializers import (
     PollListSerializer, 
-    PollDetailSerializer, 
+    PollDetailSerializer,
+    CreatedUserPollSerializer, 
     PollCreateSerializer,
     PollUpdateSerializer, 
     CreateRatingSerializer,
     CreateChoiceSerializer,
     AnswerSerializer,
-    QuestionSerializer,
     QuestionCreateSerializer,
     QuestionUpdateSerializer,
-    AnswerCreateSerializer)
+    AnswerCreateSerializer,
+    ResultUserListSerializer,
+    ResultUserPollSerializer,)
 
 class Round(models.Func): #функция для округления до десятых
     """Округление до десятых"""
     function = 'ROUND'
     template='%(function)s(%(expressions)s, 1)'
+
 
 class PollsViewSet(viewsets.ModelViewSet):
     """Вьюсет для опросов"""
@@ -50,6 +52,7 @@ class PollsViewSet(viewsets.ModelViewSet):
         elif self.action =='destroy':
             return PollCreateSerializer
 
+
 class AddRatingViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     """добавление рейтинга опросу"""
     permission_classes = [permissions.IsAuthenticated]
@@ -59,7 +62,6 @@ class AddRatingViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
 class QuestionsViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     """Создание, удаление, обновление вопросов"""
     permission_classes = [permissions.IsAuthenticated]
-
     queryset = Question.objects.filter()
 
     def get_serializer_class(self):
@@ -91,24 +93,36 @@ class CreateChoiceViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     serializer_class = CreateChoiceSerializer
     
     
-
-class PollDataViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+class PollDataViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.ListModelMixin):
     """Данные об опросе"""
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = PollDetailSerializer
+    permission_classes = [permissions.IsAuthenticated] #изменить пермишены на автора
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return CreatedUserPollSerializer
+        elif self.action == "retrieve":
+            return PollDetailSerializer
 
     def get_queryset(self):
         poll = Poll.objects.annotate(
             total_complete = models.Count('choices')
-        ).filter()
+        ).filter(creator=self.request.user)
         return poll
 
-    # def answer_annotate(self):
-    #     answer = Answer.objects.annotate(
-    #         total_a = models.Count('')
-    #     ).all()
-    #     return answer
 
+class ResultUserPollsViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.ListModelMixin):
+    """вывод результатов опросов для пользователей"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ResultUserListSerializer
+        elif self.action == "retrieve":
+            return ResultUserPollSerializer
+
+    def get_queryset(self):
+        choices = Choices.objects.filter(user=self.request.user)
+        return choices
 
 # def perform_create(self, serializer):
 #     poll = serializer.save()

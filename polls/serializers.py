@@ -19,9 +19,8 @@ class AnswerSerializer(serializers.ModelSerializer):
         fields = ('answer', 'id',)
 
 
-
 class AnswerCreateSerializer(serializers.ModelSerializer):
-    """Ответы"""
+    """Создание ответов"""
     class Meta:
         model = Answer
         fields = ('answer', 'id', 'question')
@@ -34,8 +33,6 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ('question', 'id', 'answers') 
-
-
 
 
 class QuestionCreateSerializer(serializers.ModelSerializer):
@@ -53,6 +50,7 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
             Answer.objects.create(question=question, **answer_data)
         return question
 
+
 class QuestionUpdateSerializer(serializers.ModelSerializer):
     """Вопросы"""    
     
@@ -61,12 +59,9 @@ class QuestionUpdateSerializer(serializers.ModelSerializer):
         fields = ('question', 'id') 
 
 
-
-
 class PollCreateSerializer(serializers.ModelSerializer):
     """Создание опроса"""
     questions = QuestionSerializer(many=True)
-    # id = serializers.IntegerField(required=False)
     
     class Meta:
         model = Poll
@@ -82,6 +77,7 @@ class PollCreateSerializer(serializers.ModelSerializer):
                 Answer.objects.create(question=question, **answer_data)
         return poll
 
+
 class PollUpdateSerializer(serializers.ModelSerializer):
     """Создание опроса"""
 
@@ -92,7 +88,7 @@ class PollUpdateSerializer(serializers.ModelSerializer):
 
 class CreateRatingSerializer(serializers.ModelSerializer):
     """Голосование за опрос"""
-    #middle_rate = serializers.FloatField()
+
     class Meta:
         model = Rating
         fields = ('rate','poll', 'user')
@@ -108,19 +104,16 @@ class CreateRatingSerializer(serializers.ModelSerializer):
 
 class ChoiceSerializer(serializers.ModelSerializer):
     """Ы"""
-    # total_a = serializers.SerializerMethodField()
-    # def get_total_a(self, obj):
-    #     return obj.choice.count()
+
     class Meta:
         model = Choice
         fields = ('question', 'answer',)
 
     
-
-
 class CreateChoiceSerializer(serializers.ModelSerializer):
     """Прохождение опроса"""
     choice = ChoiceSerializer(many=True, read_only=True)
+
     class Meta:
         model = Choices
         fields = ('user', 'poll', 'choice')
@@ -140,30 +133,56 @@ class CreateChoiceSerializer(serializers.ModelSerializer):
             )
         return choices
 
+
 class AnswerSerializer1(serializers.ModelSerializer):
     """Ответы"""
-    #choice = ChoiceSerializer(many=True, read_only=True)
     total_answer = serializers.SerializerMethodField()
 
     class Meta:
         model = Answer
-        fields = ('answer', 'id',  'total_answer',)#'choice',
+        fields = ('answer', 'id',  'total_answer',)
 
     def get_total_answer(self,obj):
         return Choice.objects.filter(answer=obj).count()
 
+
 class QuestionSerializer1(serializers.ModelSerializer):
     """Вопросы"""    
     answers = AnswerSerializer1(many=True)
+
     class Meta:
         model = Question
         fields = ('question', 'id', 'answers') 
 
+
 class PollDetailSerializer(serializers.ModelSerializer):
-    """Опрос"""
+    """Данные опроса для автора"""
     questions = QuestionSerializer1(many=True)
     total_complete = serializers.IntegerField()
     
     class Meta:
         model = Poll
         fields = ('title', 'id', 'creator', 'description', 'total_complete', 'questions',)
+
+
+class CreatedUserPollSerializer(serializers.ModelSerializer):
+    """список созданных пользователем опросов"""
+    class Meta:
+        model = Poll
+        fields = ('title', 'id')
+
+
+class ResultUserListSerializer(serializers.ModelSerializer):
+    """Список опросов пройденных пользователем"""
+    polls = PollListSerializer(many=True, read_only=True)
+    class Meta:
+        model = Choices
+        fields = ('poll', 'id', 'polls')
+
+
+class ResultUserPollSerializer(serializers.ModelSerializer):
+    """Ответы пользователя для опроса"""
+    choice = ChoiceSerializer(many=True)
+    class Meta:
+        model = Choices
+        fields = ('poll', 'created', 'choice')

@@ -64,12 +64,6 @@ class Choice(models.Model):
         return self.answer.answer
 
 
-# class PollChoice(models.Model):
-#     """Ответы на Опрос"""
-#     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
-#     choice = 
-
 class Rating(models.Model):
     """Рейтинг"""
     RATE_CHOICES = (

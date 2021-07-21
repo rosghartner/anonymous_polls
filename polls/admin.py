@@ -40,12 +40,12 @@ class ChoiceAdmin(admin.ModelAdmin):
     )
     #list_filter = ('user', 'poll',)
 
-class ChoicesAdmin(admin.ModelAdmin): #закоментированно для анонимности
-    list_display = (
-        'user',
-        'poll',
-        'created',
-    )
+# class ChoicesAdmin(admin.ModelAdmin): #закоментированно для анонимности
+#     list_display = (
+#         'user',
+#         'poll',
+#         'created',
+#     )
 
 class RatingAdmin(admin.ModelAdmin):
     list_display = ('rate', 'user', 'poll',)
@@ -54,6 +54,6 @@ class RatingAdmin(admin.ModelAdmin):
 admin.site.register(Poll, PollAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice, ChoiceAdmin)
-admin.site.register(Choices, ChoicesAdmin)
+# admin.site.register(Choices, ChoicesAdmin)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Rating, RatingAdmin)

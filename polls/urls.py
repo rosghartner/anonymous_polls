@@ -18,7 +18,10 @@ urlpatterns = [
     path('create-answer/', views.AnswersViewSet.as_view({'post': 'create'})), #works
     path('update-answer/<int:pk>', views.AnswersViewSet.as_view({'post': 'update'})), #works
     path('delete-answer/<int:pk>', views.AnswersViewSet.as_view({'post': 'destroy'})), #works
-    path('poll/data/<int:pk>', views.PollDataViewSet.as_view({'get': 'retrieve'})),
-    path('user/polls/', views.PollsViewSet.as_view({'get': 'retrieve'})),
+    path('poll/user-created', views.PollDataViewSet.as_view({'get': 'list'})), #works
+    path('poll/data/<int:pk>', views.PollDataViewSet.as_view({'get': 'retrieve'})), #works
+    path('user/polls/', views.ResultUserPollsViewSet.as_view({'get': 'list'})), #works
+    path('user/polls/<int:pk>', views.ResultUserPollsViewSet.as_view({'get': 'retrieve'})), #works
+
 
 ]
